@@ -9,15 +9,12 @@ Features:
 - Priority scoring engine to select the single most critical obstacle to announce
 - Temporal stability and cooldown suppression to avoid voice spamming
 """
-
 import time
 import cv2
 import numpy as np
 from ultralytics import YOLO
 import config
 from voice_assistant import voice_engine
-
-
 class SpatialVisionDetector:
     def __init__(self, model_name=config.YOLO_MODEL_NAME, conf_thresh=config.YOLO_CONFIDENCE_THRESHOLD):
         self.conf_thresh = conf_thresh
@@ -25,9 +22,6 @@ class SpatialVisionDetector:
         # Pretrained YOLO model (auto-downloads on first run if not cached)
         self.model = YOLO(model_name)
         print("[Vision Ready] YOLO model loaded.")
-
-        # Temporal stability tracking: tracks detection count over consecutive frames
-        # {class_name: consecutive_frame_count}
         self.tracking_history = {}
         self.min_consecutive_frames = 2  # Must appear in at least 2 frames to trigger speech
         self.last_spoken_alert = ""
@@ -251,8 +245,6 @@ def run_vision_webcam():
             break
 
         annotated_frame, candidates, top_obj, alert_msg = detector.process_frame(frame)
-
-        # Top overlay banner
         h, w = frame.shape[:2]
         cv2.rectangle(annotated_frame, (0, 0), (w, 45), (15, 15, 15), -1)
         status_text = f"Top Alert: {alert_msg}" if alert_msg else "Scanning surroundings..."
